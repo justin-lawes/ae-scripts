@@ -1,0 +1,34 @@
+---
+layout: tool.njk
+title: Render Folder Panel
+description: A dockable After Effects panel that auto-routes render queue output to a selected folder. New items are named after the comp with no _1 suffixes, existing files are overwritten cleanly, and a one-click button adds the selected comp and fires the render.
+version: v1.0.0
+platform: After Effects 2023+
+downloadUrl: https://github.com/justin-lawes/ae-scripts/releases/latest/download/RenderFolderPanel.jsx
+downloadLabel: Download .jsx
+githubUrl: https://github.com/justin-lawes/ae-scripts
+---
+<details class="tool-instructions">
+  <summary>Install</summary>
+  <ol>
+    <li>Download <code>RenderFolderPanel.jsx</code></li>
+    <li>Copy it to your After Effects scripts folder:<br>
+      <code>C:\Program Files\Adobe\Adobe After Effects &lt;version&gt;\Support Files\Scripts\ScriptUI Panels\</code><br>
+      (requires admin / Run as Administrator)
+    </li>
+    <li>Restart After Effects</li>
+    <li>Open via <strong>Window &rarr; RenderFolderPanel</strong> &mdash; docks like any native panel</li>
+  </ol>
+</details>
+<details class="tool-instructions">
+  <summary>Features</summary>
+  <ul class="tool-shortcuts">
+    <li><strong>Auto-route</strong> Monitors the render queue every 2s and redirects any newly added item to your chosen folder</li>
+    <li><strong>Clean filenames</strong> Output is always named after the comp &mdash; no AE-appended <code>_1</code> or <code>_2</code> suffixes</li>
+    <li><strong>Add &amp; Render</strong> One button adds the selected comp to the queue and triggers the render</li>
+    <li><strong>Overwrite protection</strong> Deletes the existing output file before rendering so AE never prompts</li>
+    <li><strong>Apply to all</strong> Reroute every item already in the queue to the selected folder in one click</li>
+    <li><strong>Persistent settings</strong> Folder path and enabled state survive AE restarts</li>
+    <li><strong>Multiple output modules</strong> All output modules per item are rerouted, not just the first</li>
+  </ul>
+</details>
