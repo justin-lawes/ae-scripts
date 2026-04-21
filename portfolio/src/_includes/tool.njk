@@ -22,10 +22,16 @@ passwordHash: b17318c0e3fe363284ff1e72a005207efb4c0d15c788951d6de04cae06ead1d0
         <span class="tool-version">{{ version }}</span>
         <span class="tool-platform">{{ platform }}</span>
       </div>
+      {% if downloadUrl or githubUrl %}
       <div class="tool-downloads">
+        {% if downloadUrl %}
         <a href="{{ downloadUrl }}" class="tool-download">{{ downloadLabel if downloadLabel else "Download ZIP" }}</a>
+        {% endif %}
+        {% if githubUrl %}
         <a href="{{ githubUrl }}" class="tool-download tool-download-secondary">View on GitHub</a>
+        {% endif %}
       </div>
+      {% endif %}
       {% if screenshot %}
       <img src="{{ screenshot }}" alt="{{ title }} screenshot" class="tool-screenshot">
       {% endif %}
