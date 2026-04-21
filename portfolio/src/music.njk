@@ -1,0 +1,64 @@
+---
+layout: base.njk
+activeNav: music
+---
+<main id="main">
+  <p class="page-intro">Alongside motion design, Justin writes and produces original music — playing in bands, releasing albums, and scoring animated projects. All album tracks are available for&nbsp;<a href="mailto:justin.lawes@gmail.com">licensing</a>.</p>
+  {% set albumOrder = [
+    "45-music-placeholder-1",
+    "48-music-placeholder-4",
+    "47-music-placeholder-3"
+  ] %}
+  {% set animationOrder = [
+    "21-noodles",
+    "16-something-savage-ipa",
+    "51-music-placeholder-7"
+  ] %}
+
+  <h2 class="section-heading">Albums</h2>
+  <div class="project-grid">
+    {%- for slug in albumOrder %}
+    {%- for project in collections.projects %}
+    {%- if project.fileSlug == slug %}
+    <a href="{{ project.url | url }}" class="project-card">
+      <div class="project-image-wrap square">
+      {% if project.data.thumbnail %}
+      <img class="project-image" src="{{ project.data.thumbnail | url }}" alt="{{ project.data.title }}" loading="lazy" decoding="async" sizes="(max-width: 480px) 100vw, 50vw"{% if project.data.thumbnailPosition or project.data.thumbnailScale or project.data.thumbnailFit or project.data.thumbnailOrigin %} style="{% if project.data.thumbnailPosition %}object-position: {{ project.data.thumbnailPosition }};{% endif %}{% if project.data.thumbnailScale %}transform: scale({{ project.data.thumbnailScale }});{% endif %}{% if project.data.thumbnailOrigin %}transform-origin: {{ project.data.thumbnailOrigin }};{% endif %}{% if project.data.thumbnailFit %}object-fit: {{ project.data.thumbnailFit }};{% endif %}"{% endif %}>
+      {% else %}
+      <div class="project-image"></div>
+      {% endif %}
+      </div>
+      <h3>{{ project.data.title }}</h3>
+      {% if project.data.subtitle %}
+      <p class="project-subtitle">{{ project.data.subtitle }}</p>
+      {% endif %}
+    </a>
+    {%- endif %}
+    {%- endfor %}
+    {%- endfor %}
+  </div>
+
+  <h2 class="section-heading">Animation Scores</h2>
+  <div class="project-grid">
+    {%- for slug in animationOrder %}
+    {%- for project in collections.projects %}
+    {%- if project.fileSlug == slug %}
+    <a href="{{ project.url | url }}" class="project-card">
+      <div class="project-image-wrap square">
+      {% if project.data.thumbnail %}
+      <img class="project-image" src="{{ project.data.thumbnail | url }}" alt="{{ project.data.title }}" loading="lazy" decoding="async" sizes="(max-width: 480px) 100vw, 50vw"{% if project.data.thumbnailPosition or project.data.thumbnailScale or project.data.thumbnailFit or project.data.thumbnailOrigin %} style="{% if project.data.thumbnailPosition %}object-position: {{ project.data.thumbnailPosition }};{% endif %}{% if project.data.thumbnailScale %}transform: scale({{ project.data.thumbnailScale }});{% endif %}{% if project.data.thumbnailOrigin %}transform-origin: {{ project.data.thumbnailOrigin }};{% endif %}{% if project.data.thumbnailFit %}object-fit: {{ project.data.thumbnailFit }};{% endif %}"{% endif %}>
+      {% else %}
+      <div class="project-image"></div>
+      {% endif %}
+      </div>
+      <h3>{{ project.data.title }}</h3>
+    </a>
+    {%- endif %}
+    {%- endfor %}
+    {%- endfor %}
+  </div>
+  <script>
+    var cards = document.querySelectorAll('.project-card');
+    sessionStorage.setItem('projectNav', JSON.stringify(Array.from(cards).map(function(c) { return c.getAttribute('href'); })));
+  </script>
+</main>

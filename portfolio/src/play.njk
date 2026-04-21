@@ -1,0 +1,36 @@
+---
+layout: base.njk
+activeNav: play
+---
+<main id="main">
+  {% set projectOrder = [
+    "21-noodles", "03-bookboy", "22-chubbygreenpants", "16-something-savage-ipa",
+    "24-sleepy-brandon", "25-yoga", "26-trumpetparty",
+    "27-clotharms", "13-sharpener", "28-shape-study", "29-monster-project",
+    "30-baby-wizard", "31-stepset", "18-operator", "19-pup-sneeze",
+    "32-dust-bud", "33-sitting", "34-blorp", "35-vacuum",
+    "36-pottery", "23-traverse-city"
+  ] %}
+  <div class="project-grid">
+    {%- for slug in projectOrder %}
+    {%- for project in collections.projects %}
+    {%- if project.fileSlug == slug %}
+    <a href="{{ project.url | url }}" class="project-card{% if project.data.wide %} wide{% endif %}">
+      <div class="project-image-wrap">
+      {% if project.data.thumbnail %}
+      <img class="project-image" src="{{ project.data.thumbnail | url }}" alt="{{ project.data.title }}" loading="lazy" decoding="async" sizes="(max-width: 480px) 100vw, 50vw"{% if project.data.thumbnailPosition or project.data.thumbnailScale %} style="{% if project.data.thumbnailPosition %}object-position: {{ project.data.thumbnailPosition }};{% endif %}{% if project.data.thumbnailScale %}transform: scale({{ project.data.thumbnailScale }});{% endif %}"{% endif %}>
+      {% else %}
+      <div class="project-image"></div>
+      {% endif %}
+      </div>
+      <h3>{{ project.data.title }}</h3>
+    </a>
+    {%- endif %}
+    {%- endfor %}
+    {%- endfor %}
+  </div>
+  <script>
+    var cards = document.querySelectorAll('.project-card');
+    sessionStorage.setItem('projectNav', JSON.stringify(Array.from(cards).map(function(c) { return c.getAttribute('href'); })));
+  </script>
+</main>

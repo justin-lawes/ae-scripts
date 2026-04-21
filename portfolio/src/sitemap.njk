@@ -1,0 +1,27 @@
+---
+permalink: /sitemap.xml
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://justinlawes.com/</loc>
+  </url>
+  <url>
+    <loc>https://justinlawes.com/work/</loc>
+  </url>
+  <url>
+    <loc>https://justinlawes.com/play/</loc>
+  </url>
+  <url>
+    <loc>https://justinlawes.com/music/</loc>
+  </url>
+  <url>
+    <loc>https://justinlawes.com/about/</loc>
+  </url>
+  {%- for project in collections.projects %}
+  <url>
+    <loc>https://justinlawes.com{{ project.url }}</loc>
+  </url>
+  {%- endfor %}
+</urlset>

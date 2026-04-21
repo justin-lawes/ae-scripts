@@ -1,0 +1,63 @@
+---
+layout: base.njk
+passwordHash: b17318c0e3fe363284ff1e72a005207efb4c0d15c788951d6de04cae06ead1d0
+---
+<div class="password-gate" id="passwordGate">
+  <div class="password-gate-inner">
+    <h1>{{ title }}</h1>
+    <p>This page is password protected.</p>
+    <form id="passwordForm" autocomplete="off">
+      <input type="password" id="passwordInput" placeholder="Enter password" autocomplete="off">
+      <button type="submit">&rarr;</button>
+    </form>
+    <p class="password-error" id="passwordError" style="display:none">Incorrect password</p>
+  </div>
+</div>
+<main id="main" class="tools" style="display:none">
+  <div class="tools-content">
+    <div class="tool-card">
+      <h1>{{ title }}</h1>
+      <p>{{ description }}</p>
+      <div class="tool-meta">
+        <span class="tool-version">{{ version }}</span>
+        <span class="tool-platform">{{ platform }}</span>
+      </div>
+      <div class="tool-downloads">
+        <a href="{{ downloadUrl }}" class="tool-download">{{ downloadLabel if downloadLabel else "Download ZIP" }}</a>
+        <a href="{{ githubUrl }}" class="tool-download tool-download-secondary">View on GitHub</a>
+      </div>
+      {% if screenshot %}
+      <img src="{{ screenshot }}" alt="{{ title }} screenshot" class="tool-screenshot">
+      {% endif %}
+      {{ content | safe }}
+    </div>
+  </div>
+</main>
+<script>
+(function() {
+  var hash = '{{ passwordHash }}';
+  var key = 'pw_tools';
+  if (sessionStorage.getItem(key) === hash) {
+    document.getElementById('passwordGate').style.display = 'none';
+    document.getElementById('main').style.display = '';
+    return;
+  }
+  document.getElementById('passwordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var pw = document.getElementById('passwordInput').value;
+    crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw)).then(function(buf) {
+      var arr = Array.from(new Uint8Array(buf));
+      var hex = arr.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      if (hex === hash) {
+        sessionStorage.setItem(key, hash);
+        document.getElementById('passwordGate').style.display = 'none';
+        document.getElementById('main').style.display = '';
+      } else {
+        document.getElementById('passwordError').style.display = 'block';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+      }
+    });
+  });
+})();
+</script>

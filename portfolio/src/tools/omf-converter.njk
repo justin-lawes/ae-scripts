@@ -1,0 +1,31 @@
+---
+layout: tool.njk
+title: OMF Converter
+description: Converts OMF (Open Media Format) audio files to Ableton Live sets. Drag and drop an .omf file exported from Pro Tools, Logic, Nuendo, or any OMF-capable DAW and get an .als you can open in Ableton Live.
+version: v1.0.0
+platform: macOS 11+ (Apple Silicon)
+downloadUrl: https://github.com/justin-lawes/omf/releases/download/v1.0.0/OMF-Importer.zip
+downloadLabel: Download .app
+githubUrl: https://github.com/justin-lawes/omf
+---
+<details class="tool-instructions">
+  <summary>Install</summary>
+  <ol>
+    <li>Unzip the download</li>
+    <li>Drag <strong>OMF Importer</strong> into your Applications folder</li>
+    <li>Right-click the app &rarr; <strong>Open</strong> &rarr; click <strong>Open</strong> in the dialog (first time only)</li>
+  </ol>
+</details>
+<details class="tool-instructions">
+  <summary>What Gets Imported</summary>
+  <ul class="tool-shortcuts">
+    <li><strong>Track names</strong> Preserved from the original session</li>
+    <li><strong>Track count / structure</strong> Matched to the OMF layout</li>
+    <li><strong>Audio clip positions</strong> Best-effort timeline placement</li>
+    <li><strong>Audio file references</strong> Linked to source files</li>
+    <li><strong>MIDI regions</strong> Converted to Ableton MIDI clips</li>
+    <li><strong>Volume / pan</strong> Per-track levels carried over</li>
+    <li><strong>Plugin settings</strong> Not supported (OMF limitation)</li>
+    <li><strong>FX chains</strong> Not supported (OMF limitation)</li>
+  </ul>
+</details>

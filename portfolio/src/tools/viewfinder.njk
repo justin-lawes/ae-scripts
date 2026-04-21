@@ -1,0 +1,46 @@
+---
+layout: tool.njk
+title: Viewfinder
+description: A minimal native macOS video player built for reviewing footage. Frame-accurate playback, shuttle controls, drawing annotations, timestamped comments, and customizable shortcuts.
+version: v1.0.0
+platform: macOS 13+ (Apple Silicon)
+downloadUrl: https://github.com/justin-lawes/ViewfinderNative/releases/download/v1.0.0/Viewfinder-1.0.0-arm64.zip
+githubUrl: https://github.com/justin-lawes/ViewfinderNative
+---
+<details class="tool-instructions">
+  <summary>Install</summary>
+  <p>This app isn't signed with an Apple Developer certificate, so macOS will block it by default. Open Terminal, paste this command, and press Return:</p>
+  <pre><code>xattr -cr ~/Downloads/Viewfinder.app</code></pre>
+  <p>Then:</p>
+  <ol>
+    <li>Drag Viewfinder into your Applications folder</li>
+    <li>Double-click to open</li>
+  </ol>
+</details>
+<details class="tool-instructions">
+  <summary>Build from Source</summary>
+  <ol>
+    <li>Install Xcode Command Line Tools: <code>xcode-select --install</code></li>
+    <li>Clone: <code>git clone https://github.com/justin-lawes/ViewfinderNative.git && cd ViewfinderNative</code></li>
+    <li>Build: <code>find Viewfinder -name "*.swift" | sort | tr '\n' ' ' | xargs swiftc -o build/Viewfinder -framework Cocoa -framework AVFoundation -framework CoreMedia -framework CoreImage</code></li>
+    <li>Install: <code>cp build/Viewfinder Viewfinder.app/Contents/MacOS/Viewfinder && cp -r Viewfinder.app /Applications/</code></li>
+  </ol>
+</details>
+<details class="tool-instructions">
+  <summary>Keyboard Shortcuts</summary>
+  <ul class="tool-shortcuts">
+    <li><kbd>Space</kbd> Play / Pause</li>
+    <li><kbd>← →</kbd> Frame back / forward</li>
+    <li><kbd>Shift + ← →</kbd> Skip 10s</li>
+    <li><kbd>J / K / L</kbd> Shuttle reverse / stop / forward</li>
+    <li><kbd>[ ]</kbd> Speed down / up</li>
+    <li><kbd>T</kbd> Cycle timeline mode</li>
+    <li><kbd>F</kbd> Toggle fullscreen</li>
+    <li><kbd>D</kbd> Annotation mode</li>
+    <li><kbd>C</kbd> Color picker</li>
+    <li><kbd>;</kbd> Comments panel</li>
+    <li><kbd>N</kbd> Add comment</li>
+    <li><kbd>S</kbd> Screenshot to clipboard</li>
+    <li><kbd>Opt + S</kbd> Screenshot to Desktop</li>
+  </ul>
+</details>

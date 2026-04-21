@@ -1,0 +1,37 @@
+---
+layout: base.njk
+activeNav: work
+---
+<main id="main">
+  {% set projectOrder = [
+    "54-superhuman",
+    "01-blend", "02-perplexity", "04-sonos-beam", "37-tomtom", "05-msk",
+    "38-nextdoor", "06-mailchimp", "07-lark-magic-share", "10-chase-bliss",
+    "11-agog", "08-whywater", "12-googleedu", "39-westwood", "09-grails-iii",
+    "40-bestfriendsclub", "20-exposure", "41-katerra", "42-red-hat",
+    "14-hootsuite", "15-reformation", "17-interiors-awards", "43-collaboration",
+    "44-sana", "53-airbnb"
+  ] %}
+  <div class="project-grid">
+    {%- for slug in projectOrder %}
+    {%- for project in collections.projects %}
+    {%- if project.fileSlug == slug %}
+    <a href="{{ project.url | url }}" class="project-card{% if project.data.wide %} wide{% endif %}">
+      <div class="project-image-wrap"{% if project.data.thumbnailBg %} style="background: {{ project.data.thumbnailBg }};"{% endif %}>
+      {% if project.data.thumbnail %}
+      <img class="project-image" src="{{ project.data.thumbnail | url }}" alt="{{ project.data.title }}" loading="lazy" decoding="async" sizes="(max-width: 480px) 100vw, 50vw"{% if project.data.thumbnailPosition or project.data.thumbnailScale or project.data.thumbnailFit or project.data.thumbnailBg or project.data.thumbnailOrigin %} style="{% if project.data.thumbnailPosition %}object-position: {{ project.data.thumbnailPosition }};{% endif %}{% if project.data.thumbnailScale %}transform: scale({{ project.data.thumbnailScale }});{% endif %}{% if project.data.thumbnailOrigin %}transform-origin: {{ project.data.thumbnailOrigin }};{% endif %}{% if project.data.thumbnailFit %}object-fit: {{ project.data.thumbnailFit }};{% endif %}{% if project.data.thumbnailBg %}background: {{ project.data.thumbnailBg }};{% endif %}"{% endif %}>
+      {% else %}
+      <div class="project-image"></div>
+      {% endif %}
+      </div>
+      <h3>{{ project.data.cardTitle if project.data.cardTitle else project.data.title }}</h3>
+    </a>
+    {%- endif %}
+    {%- endfor %}
+    {%- endfor %}
+  </div>
+  <script>
+    var cards = document.querySelectorAll('.project-card');
+    sessionStorage.setItem('projectNav', JSON.stringify(Array.from(cards).map(function(c) { return c.getAttribute('href'); })));
+  </script>
+</main>
