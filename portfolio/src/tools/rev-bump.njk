@@ -1,0 +1,34 @@
+---
+layout: tool.njk
+title: Rev Bump
+description: A dockable After Effects panel that increments the letter or version number in filenames like Particles_B_v01.aep. One click saves a new version with the next letter or number without leaving After Effects.
+version: v1.0.0
+platform: After Effects 2023+
+downloadUrl: https://github.com/justin-lawes/ae-scripts/releases/latest/download/Rev Bump.jsx
+downloadLabel: Download .jsx
+githubUrl: https://github.com/justin-lawes/ae-scripts
+screenshot: /images/rev-bump.png
+---
+<details class="tool-instructions">
+  <summary>Install</summary>
+  <ol>
+    <li>Download <code>Rev Bump.jsx</code></li>
+    <li>Copy it to your After Effects scripts folder:<br>
+      <code>C:\Program Files\Adobe\Adobe After Effects &lt;version&gt;\Support Files\Scripts\ScriptUI Panels\</code><br>
+      (requires admin / Run as Administrator)
+    </li>
+    <li>Restart After Effects</li>
+    <li>Open via <strong>Window &rarr; Rev Bump</strong> &mdash; docks like any native panel</li>
+  </ol>
+</details>
+<details class="tool-instructions">
+  <summary>Features</summary>
+  <ul class="tool-shortcuts">
+    <li><strong>Letter Bump</strong> Increments the letter segment of the filename (A &rarr; B, B &rarr; C&hellip;) and saves as a new .aep</li>
+    <li><strong>Number Bump</strong> Increments the version number (v01 &rarr; v02) and saves as a new .aep</li>
+    <li><strong>Live preview</strong> Shows what the new filename will be before you commit</li>
+    <li><strong>Comp rename</strong> Automatically renames the matching comp inside the project to stay in sync</li>
+    <li><strong>Flexible naming</strong> Supports filenames with or without a middle segment (e.g. <code>Project_A_Navy_v01</code> or <code>Project_A_v01</code>)</li>
+    <li><strong>Overwrite guard</strong> Prompts before overwriting an existing file</li>
+  </ul>
+</details>
