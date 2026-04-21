@@ -20,12 +20,18 @@ passwordHash: b17318c0e3fe363284ff1e72a005207efb4c0d15c788951d6de04cae06ead1d0
       <p>{{ description }}</p>
       <div class="tool-meta">
         <span class="tool-version">{{ version }}</span>
-        <span class="tool-platform">{{ platform }}</span>
+        {% if platform %}<span class="tool-platform">{{ platform }}</span>{% endif %}
       </div>
-      {% if downloadUrl or githubUrl %}
+      {% if downloads or downloadUrl or githubUrl %}
       <div class="tool-downloads">
-        {% if downloadUrl %}
-        <a href="{{ downloadUrl }}" class="tool-download">{{ downloadLabel if downloadLabel else "Download ZIP" }}</a>
+        {% if downloads %}
+          {% for dl in downloads %}
+            <a href="{{ dl.url }}" class="tool-download{% if dl.secondary %} tool-download-secondary{% endif %}">{{ dl.label }}</a>
+          {% endfor %}
+        {% else %}
+          {% if downloadUrl %}
+          <a href="{{ downloadUrl }}" class="tool-download">{{ downloadLabel if downloadLabel else "Download ZIP" }}</a>
+          {% endif %}
         {% endif %}
         {% if githubUrl %}
         <a href="{{ githubUrl }}" class="tool-download tool-download-secondary">View on GitHub</a>
