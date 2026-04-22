@@ -344,8 +344,8 @@
 
         var pathDisplay = pathRow.add("edittext", undefined, "");
         pathDisplay.alignment     = ["fill", "center"];
-        pathDisplay.enabled       = false;
         pathDisplay.preferredSize = [-1, 22];
+        pathDisplay.helpTip       = "Type or paste a folder path, then press Enter.\nOr use the … button to browse.";
 
         var browseBtn = pathRow.add("button", undefined, "\u2026");  // …
         browseBtn.preferredSize = [30, 22];
@@ -378,7 +378,9 @@
 
         // ── Update helpers ────────────────────────────────────────────────────────
         function updateUI() {
-            pathDisplay.text  = state.selectedFolder || "No folder selected";
+            // Only overwrite the text if the user isn't actively editing it
+            if (!pathDisplay.active)
+                pathDisplay.text = state.selectedFolder || "No folder selected";
             enableCheck.value = state.isEnabled;
             applyBtn.enabled  = !!state.selectedFolder;
 
@@ -392,6 +394,28 @@
         }
 
         // ── Event handlers ────────────────────────────────────────────────────────
+
+        // Accept a typed/pasted path when the field loses focus or Enter is pressed.
+        function commitTypedPath() {
+            var typed = pathDisplay.text;
+            if (!typed || typed === "No folder selected") return;
+            var f = new Folder(typed);
+            if (f.exists) {
+                state.selectedFolder = f.fsName;
+                updateUI();
+                saveSettings();
+                if (state.isEnabled) startMonitoring();
+            } else {
+                // Flash the old value back so the field doesn't stay wrong
+                pathDisplay.text = state.selectedFolder || "No folder selected";
+                alert("Folder not found:\n" + typed);
+            }
+        }
+        pathDisplay.onDeactivate = commitTypedPath;
+        pathDisplay.addEventListener("keydown", function (kd) {
+            if (kd.keyName === "Enter") { commitTypedPath(); }
+        });
+
         browseBtn.onClick = function () {
             var start  = state.selectedFolder ? new Folder(state.selectedFolder) : Folder.desktop;
             var chosen = Folder.selectDialog("Select Render Output Folder", start);
