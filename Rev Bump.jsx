@@ -171,6 +171,11 @@
         sep2.alignment = ["fill", "top"];
         sep2.preferredSize.height = 2;
 
+        // Rename project file checkbox
+        var chkFile = win.add("checkbox", undefined, "Rename project file");
+        chkFile.value = false;
+        chkFile.enabled = false;
+
         // Buttons
         var grpBtns = win.add("group");
         grpBtns.orientation = "row";
@@ -207,10 +212,15 @@
                 txtNumberPreview.text = "\u2014";
                 btnLetter.enabled = false;
                 btnNumber.enabled = false;
+                chkFile.enabled = false;
+                chkFile.value = false;
                 state = null;
                 win.layout.layout(true);
                 return;
             }
+
+            chkFile.enabled = source.fromFile;
+            if (!source.fromFile) chkFile.value = false;
 
             txtSource.text = source.fromFile ? "" : "reading from active comp";
 
@@ -222,6 +232,8 @@
                 txtNumberPreview.text = "(no match)";
                 btnLetter.enabled = false;
                 btnNumber.enabled = false;
+                chkFile.enabled = false;
+                chkFile.value = false;
                 state = null;
                 win.layout.layout(true);
                 return;
@@ -254,7 +266,7 @@
         btnLetter.onClick = function () {
             if (!state) return;
             try {
-                var ok = state.fromFile
+                var ok = chkFile.value
                     ? saveAs(state.proj, state.currentName, state.letterName)
                     : (renameMatchingComp(state.proj, state.currentName, state.letterName), true);
                 if (ok) updateUI(app.project);
@@ -266,7 +278,7 @@
         btnNumber.onClick = function () {
             if (!state) return;
             try {
-                var ok = state.fromFile
+                var ok = chkFile.value
                     ? saveAs(state.proj, state.currentName, state.numberName)
                     : (renameMatchingComp(state.proj, state.currentName, state.numberName), true);
                 if (ok) updateUI(app.project);
