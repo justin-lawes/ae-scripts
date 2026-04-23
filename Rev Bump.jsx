@@ -84,7 +84,17 @@
         var newCode = wrapped ? 65 : code + 1;
         var newLetter = String.fromCharCode(newCode);
         if (parts.letter === parts.letter.toLowerCase()) newLetter = newLetter.toLowerCase();
-        var newParts = { prefix: parts.prefix, letter: newLetter, middle: parts.middle, vPrefix: parts.vPrefix, numStr: parts.numStr };
+        var newParts = { prefix: parts.prefix, letter: newLetter, middle: parts.middle, vPrefix: parts.vPrefix, numStr: parts.numStr, hasLetter: true };
+        return { name: buildName(newParts), wrapped: wrapped };
+    }
+
+    function decrementLetter(parts) {
+        var code = parts.letter.toUpperCase().charCodeAt(0);
+        var wrapped = (code <= 65); // A wraps to Z
+        var newCode = wrapped ? 90 : code - 1;
+        var newLetter = String.fromCharCode(newCode);
+        if (parts.letter === parts.letter.toLowerCase()) newLetter = newLetter.toLowerCase();
+        var newParts = { prefix: parts.prefix, letter: newLetter, middle: parts.middle, vPrefix: parts.vPrefix, numStr: parts.numStr, hasLetter: true };
         return { name: buildName(newParts), wrapped: wrapped };
     }
 
@@ -93,7 +103,16 @@
         var padLen = Math.max(parts.numStr.length, String(num).length);
         var padded = String(num);
         while (padded.length < padLen) padded = "0" + padded;
-        var newParts = { prefix: parts.prefix, letter: parts.letter, middle: parts.middle, vPrefix: parts.vPrefix, numStr: padded };
+        var newParts = { prefix: parts.prefix, letter: parts.letter, middle: parts.middle, vPrefix: parts.vPrefix, numStr: padded, hasLetter: parts.hasLetter };
+        return buildName(newParts);
+    }
+
+    function decrementNumber(parts) {
+        var num = Math.max(0, parseInt(parts.numStr, 10) - 1);
+        var padLen = Math.max(parts.numStr.length, String(num).length);
+        var padded = String(num);
+        while (padded.length < padLen) padded = "0" + padded;
+        var newParts = { prefix: parts.prefix, letter: parts.letter, middle: parts.middle, vPrefix: parts.vPrefix, numStr: padded, hasLetter: parts.hasLetter };
         return buildName(newParts);
     }
 
@@ -163,6 +182,14 @@
         txtLetterPreview.justify = "left";
         txtLetterPreview.preferredSize.width = 210;
 
+        var grpLetterDownPreview = win.add("group");
+        grpLetterDownPreview.orientation = "row";
+        var lblLetterDown = grpLetterDownPreview.add("statictext", undefined, "Letter \u2193:");
+        lblLetterDown.preferredSize.width = 72;
+        var txtLetterDownPreview = grpLetterDownPreview.add("statictext", undefined, "\u2014");
+        txtLetterDownPreview.justify = "left";
+        txtLetterDownPreview.preferredSize.width = 210;
+
         var grpNumberPreview = win.add("group");
         grpNumberPreview.orientation = "row";
         var lblNumber = grpNumberPreview.add("statictext", undefined, "Number \u2191:");
@@ -171,7 +198,15 @@
         txtNumberPreview.justify = "left";
         txtNumberPreview.preferredSize.width = 210;
 
-        // Warning label (Z→A wrap notice)
+        var grpNumberDownPreview = win.add("group");
+        grpNumberDownPreview.orientation = "row";
+        var lblNumberDown = grpNumberDownPreview.add("statictext", undefined, "Number \u2193:");
+        lblNumberDown.preferredSize.width = 72;
+        var txtNumberDownPreview = grpNumberDownPreview.add("statictext", undefined, "\u2014");
+        txtNumberDownPreview.justify = "left";
+        txtNumberDownPreview.preferredSize.width = 210;
+
+        // Warning label (Z→A / A→Z wrap notice)
         var txtWarning = win.add("statictext", undefined, "");
         txtWarning.justify = "center";
         try {
@@ -189,13 +224,21 @@
         chkFile.value = false;
         chkFile.enabled = false;
 
-        // Buttons
+        // Up buttons
         var grpBtns = win.add("group");
         grpBtns.orientation = "row";
         grpBtns.alignment = ["fill", "top"];
         grpBtns.alignChildren = ["fill", "center"];
         var btnLetter = grpBtns.add("button", undefined, "Letter \u2191");
         var btnNumber = grpBtns.add("button", undefined, "Number \u2191");
+
+        // Down buttons
+        var grpBtnsDown = win.add("group");
+        grpBtnsDown.orientation = "row";
+        grpBtnsDown.alignment = ["fill", "top"];
+        grpBtnsDown.alignChildren = ["fill", "center"];
+        var btnLetterDown = grpBtnsDown.add("button", undefined, "Letter \u2193");
+        var btnNumberDown = grpBtnsDown.add("button", undefined, "Number \u2193");
 
         var btnRefresh = win.add("button", undefined, "Refresh");
 
@@ -222,9 +265,13 @@
                 txtCurrent.text = noProj ? "(no project open)" : "(no matching comp found)";
                 txtSource.text = "";
                 txtLetterPreview.text = "\u2014";
+                txtLetterDownPreview.text = "\u2014";
                 txtNumberPreview.text = "\u2014";
+                txtNumberDownPreview.text = "\u2014";
                 btnLetter.enabled = false;
+                btnLetterDown.enabled = false;
                 btnNumber.enabled = false;
+                btnNumberDown.enabled = false;
                 chkFile.enabled = false;
                 chkFile.value = false;
                 state = null;
@@ -242,9 +289,13 @@
             if (!parts) {
                 txtCurrent.text = source.name;
                 txtLetterPreview.text = "(no match)";
+                txtLetterDownPreview.text = "(no match)";
                 txtNumberPreview.text = "(no match)";
+                txtNumberDownPreview.text = "(no match)";
                 btnLetter.enabled = false;
+                btnLetterDown.enabled = false;
                 btnNumber.enabled = false;
+                btnNumberDown.enabled = false;
                 chkFile.enabled = false;
                 chkFile.value = false;
                 state = null;
@@ -252,23 +303,32 @@
                 return;
             }
 
-            var letterResult = parts.hasLetter ? incrementLetter(parts) : null;
-            var numberName   = incrementNumber(parts);
+            var letterResult     = parts.hasLetter ? incrementLetter(parts) : null;
+            var letterDownResult = parts.hasLetter ? decrementLetter(parts) : null;
+            var numberName       = incrementNumber(parts);
+            var numberDownName   = decrementNumber(parts);
 
-            txtCurrent.text       = source.name;
-            txtLetterPreview.text = letterResult ? letterResult.name : "\u2014";
-            txtNumberPreview.text = numberName;
-            btnLetter.enabled = !!letterResult;
-            btnNumber.enabled = true;
+            txtCurrent.text           = source.name;
+            txtLetterPreview.text     = letterResult     ? letterResult.name     : "\u2014";
+            txtLetterDownPreview.text = letterDownResult ? letterDownResult.name : "\u2014";
+            txtNumberPreview.text     = numberName;
+            txtNumberDownPreview.text = numberDownName;
+            btnLetter.enabled     = !!letterResult;
+            btnLetterDown.enabled = !!letterDownResult;
+            btnNumber.enabled     = true;
+            btnNumberDown.enabled = true;
 
-            if (letterResult && letterResult.wrapped) txtWarning.text = "Z wrapped to A";
+            if (letterResult && letterResult.wrapped) txtWarning.text = "Z \u2192 A";
+            if (letterDownResult && letterDownResult.wrapped) txtWarning.text = "A \u2192 Z";
 
             state = {
-                currentName: source.name,
-                letterName:  letterResult ? letterResult.name : null,
-                numberName:  numberName,
-                fromFile:    source.fromFile,
-                proj:        proj
+                currentName:   source.name,
+                letterName:    letterResult     ? letterResult.name     : null,
+                letterDownName: letterDownResult ? letterDownResult.name : null,
+                numberName:    numberName,
+                numberDownName: numberDownName,
+                fromFile:      source.fromFile,
+                proj:          proj
             };
 
             win.layout.layout(true);
@@ -294,6 +354,30 @@
                 var ok = chkFile.value
                     ? saveAs(state.proj, state.currentName, state.numberName)
                     : (renameMatchingComp(state.proj, state.currentName, state.numberName), true);
+                if (ok) updateUI(app.project);
+            } catch (e) {
+                alert("Operation failed:\n" + e.toString());
+            }
+        };
+
+        btnLetterDown.onClick = function () {
+            if (!state || !state.letterDownName) return;
+            try {
+                var ok = chkFile.value
+                    ? saveAs(state.proj, state.currentName, state.letterDownName)
+                    : (renameMatchingComp(state.proj, state.currentName, state.letterDownName), true);
+                if (ok) updateUI(app.project);
+            } catch (e) {
+                alert("Operation failed:\n" + e.toString());
+            }
+        };
+
+        btnNumberDown.onClick = function () {
+            if (!state) return;
+            try {
+                var ok = chkFile.value
+                    ? saveAs(state.proj, state.currentName, state.numberDownName)
+                    : (renameMatchingComp(state.proj, state.currentName, state.numberDownName), true);
                 if (ok) updateUI(app.project);
             } catch (e) {
                 alert("Operation failed:\n" + e.toString());
