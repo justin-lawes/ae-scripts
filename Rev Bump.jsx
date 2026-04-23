@@ -18,19 +18,28 @@
     // proj is app.project captured in the calling event handler.
     // Returns { name, fromFile } or null.
     function getSourceName(proj) {
-        // Try project file name first
+        // Try active/selected comp first
+        try {
+            var active = proj.activeItem;
+            if (active && active instanceof CompItem) {
+                return { name: active.name, fromFile: false };
+            }
+        } catch (e) {}
+
+        // Fall back to project file name
         var fileName = null;
         try { fileName = proj.file.name; } catch (e) {}
         if (fileName) {
             return { name: fileName.replace(/\.aep$/i, ""), fromFile: true };
         }
-        // Fall back: scan all items for a comp matching the pattern
+
+        // Last resort: scan for any comp with a _vNN suffix
         var numItems = 0;
         try { numItems = proj.numItems; } catch (e) {}
         for (var i = 1; i <= numItems; i++) {
             try {
                 var item = proj.item(i);
-                if (item instanceof CompItem && PATTERN.test(item.name)) {
+                if (item instanceof CompItem && /_(v\d+)$/i.test(item.name)) {
                     return { name: item.name, fromFile: false };
                 }
             } catch (e) {}
@@ -39,7 +48,7 @@
     }
 
     function parseName(base) {
-        // Two-step: strip _vNN suffix, then find the letter segment.
+        // Two-step: strip _vNN suffix, then optionally find a letter segment.
         // Avoids an ExtendScript regex bug where group 2 is undefined when
         // the optional group 3 (?:(.+)_)? captures a value in one-pass matching.
         var vMatch = base.match(/_(v\d+)$/i);
@@ -51,16 +60,20 @@
 
         // Find prefix_LETTER_middle (non-greedy prefix to get the FIRST _X_ segment)
         var m = body.match(/^(.+?)_([A-Za-z])_(.+)$/);
-        if (m) return { prefix: m[1], letter: m[2], middle: m[3], vPrefix: vPrefix, numStr: numStr };
+        if (m) return { prefix: m[1], letter: m[2], middle: m[3], vPrefix: vPrefix, numStr: numStr, hasLetter: true };
 
         // Find prefix_LETTER (no middle)
         m = body.match(/^(.+?)_([A-Za-z])$/);
-        if (m) return { prefix: m[1], letter: m[2], middle: null, vPrefix: vPrefix, numStr: numStr };
+        if (m) return { prefix: m[1], letter: m[2], middle: null, vPrefix: vPrefix, numStr: numStr, hasLetter: true };
 
-        return null;
+        // No letter segment — just bump the version number
+        return { prefix: body, letter: null, middle: null, vPrefix: vPrefix, numStr: numStr, hasLetter: false };
     }
 
     function buildName(parts) {
+        if (!parts.hasLetter) {
+            return parts.prefix + "_" + parts.vPrefix + parts.numStr;
+        }
         var mid = parts.middle ? "_" + parts.middle : "";
         return parts.prefix + "_" + parts.letter + mid + "_" + parts.vPrefix + parts.numStr;
     }
@@ -222,7 +235,7 @@
             chkFile.enabled = source.fromFile;
             if (!source.fromFile) chkFile.value = false;
 
-            txtSource.text = source.fromFile ? "" : "reading from active comp";
+            txtSource.text = source.fromFile ? "" : "reading from selected comp";
 
             var parts = parseName(source.name);
 
@@ -239,20 +252,20 @@
                 return;
             }
 
-            var letterResult = incrementLetter(parts);
+            var letterResult = parts.hasLetter ? incrementLetter(parts) : null;
             var numberName   = incrementNumber(parts);
 
             txtCurrent.text       = source.name;
-            txtLetterPreview.text = letterResult.name;
+            txtLetterPreview.text = letterResult ? letterResult.name : "\u2014";
             txtNumberPreview.text = numberName;
-            btnLetter.enabled = true;
+            btnLetter.enabled = !!letterResult;
             btnNumber.enabled = true;
 
-            if (letterResult.wrapped) txtWarning.text = "Z wrapped to A";
+            if (letterResult && letterResult.wrapped) txtWarning.text = "Z wrapped to A";
 
             state = {
                 currentName: source.name,
-                letterName:  letterResult.name,
+                letterName:  letterResult ? letterResult.name : null,
                 numberName:  numberName,
                 fromFile:    source.fromFile,
                 proj:        proj
