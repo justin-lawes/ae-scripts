@@ -41,6 +41,12 @@
         c4d:1,obj:1,fbx:1,aep:1,prproj:1,mogrt:1,aepx:1
     };
 
+    // If getFiles() on a folder takes longer than this, treat the folder
+    // as pathological (cloud sync stub, huge node_modules, etc.) and do
+    // NOT recurse into its subfolders. Files directly in that folder are
+    // still kept — only its children are skipped.
+    var SLOW_FOLDER_THRESHOLD_MS = 5000;
+
     function getExtension(name) {
         var dot = name.lastIndexOf('.');
         return dot >= 0 ? name.substring(dot + 1).toLowerCase() : '';
@@ -281,14 +287,15 @@
         if (scan.queue.length === 0) {
             scan.done = true;
             var fileMap = buildFileMap(scan.files);
-            logWrite('DONE — ' + scan.processed + ' folders, ' + scan.files.length + ' media files');
+            var slowNote = scan.slowSkipped ? ' (' + scan.slowSkipped + ' slow folder' + (scan.slowSkipped === 1 ? '' : 's') + ' not recursed)' : '';
+            logWrite('DONE — ' + scan.processed + ' folders, ' + scan.files.length + ' media files' + slowNote);
             if (ui) {
                 try { ui.progBar.value = 100; }                                                                               catch (e) {}
                 try { ui.cancelBtn.enabled = false; }                                                                         catch (e) {}
                 try { ui.scanBtn.text = scan.files.length + ' files found  \u2014  scan again?'; ui.scanBtn.enabled = true; } catch (e) {}
                 try { ui.browseBtn.enabled = true; }                                                                          catch (e) {}
                 try { ui.progGroup.visible = false; }                                                                         catch (e) {}
-                try { ui.scanResultLabel.text = 'Scanned ' + scan.files.length + ' files.'; }                                 catch (e) {}
+                try { ui.scanResultLabel.text = 'Scanned ' + scan.files.length + ' files.' + (scan.slowSkipped ? ' ' + scan.slowSkipped + ' slow folder(s) skipped — see log.' : ''); } catch (e) {}
                 try { ui.win.layout.layout(true); }                                                                           catch (e) {}
             }
             if (ui && ui.onComplete) ui.onComplete(scan.files, fileMap);
@@ -321,11 +328,13 @@
             var t0 = new Date().getTime();
             var contents = folder.getFiles();
             var dt = new Date().getTime() - t0;
-            logWrite('  getFiles() returned ' + contents.length + ' entries in ' + dt + 'ms');
+            var slow = dt > SLOW_FOLDER_THRESHOLD_MS;
+            logWrite('  getFiles() returned ' + contents.length + ' entries in ' + dt + 'ms' + (slow ? ' [SLOW]' : ''));
             for (var i = 0; i < contents.length; i++) {
                 var entry = contents[i];
                 if (entry.name.charAt(0) === '.') continue;
                 if (entry instanceof Folder) {
+                    if (slow) continue;
                     scan.queue.push(entry);
                     addedFolders++;
                 } else if (entry instanceof File) {
@@ -334,6 +343,10 @@
                         addedFiles++;
                     }
                 }
+            }
+            if (slow) {
+                scan.slowSkipped = (scan.slowSkipped || 0) + 1;
+                logWrite('  ! SLOW folder — not recursing into its subfolders');
             }
             logWrite('  \u2192 ' + addedFiles + ' media, ' + addedFolders + ' subfolders (queue=' + scan.queue.length + ', total files=' + scan.files.length + ')');
         } catch (e) {
